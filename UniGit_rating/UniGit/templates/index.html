@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<body>
+{% load socialaccount %}
+{% if user.is_authenticated %}
+    <h1>
+Привет, {{ user.socialaccount_set.all.0.extra_data.login }}!</h1>
+    <hr>
+    <h2>Твои коммиты:</h2>
+    {% for commit in commits %}
+        <p>{{ commit.message }}</p>
+    {% empty %}
+        <p>Коммитов пока нет. Попробуй обновить страницу.</p>
+    {% endfor %}
+    <p>Привет, {{ user.username }}!</p>
+    <a href="{% url 'account_logout' %}">Выйти</a>
+{% else %}
+    <a href="{% provider_login_url 'github' %}">Войти через GitHub</a>
+{% endif %}
+</body>
+</html>
