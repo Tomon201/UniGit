@@ -1,21 +1,16 @@
-<!DOCTYPE html>
-<html>
-<body>
-{% load socialaccount %}
-{% if user.is_authenticated %}
-    <h1>
-Привет, {{ user.socialaccount_set.all.0.extra_data.login }}!</h1>
-    <hr>
-    <h2>Твои коммиты:</h2>
-    {% for commit in commits %}
-        <p>{{ commit.message }}</p>
-    {% empty %}
-        <p>Коммитов пока нет. Попробуй обновить страницу.</p>
-    {% endfor %}
-    <p>Привет, {{ user.username }}!</p>
-    <a href="{% url 'account_logout' %}">Выйти</a>
-{% else %}
-    <a href="{% provider_login_url 'github' %}">Войти через GitHub</a>
-{% endif %}
-</body>
-</html>
+<h1>Лидерборд</h1>
+<div>
+    <a href="?sort=unigit">По UniGit рейтингу</a> |
+    <a href="?sort=lc">По LeetCode рейтингу</a> |
+    <a href="?sort=repos">По количеству репо</a> |
+    <a href="{% url 'profile'%}">В свой профиль</a>
+</div>
+
+{% for p in profiles %}
+    <div style="border:1px solid #ccc; padding:10px; margin:5px;">
+        <h3>{{ p.github_username|default:"Пользователь" }}</h3>
+        <p><strong>UniGit Rating:</strong> {{ p.unigit_rating }}</p>
+        <p><strong>LeetCode Rating:</strong> {{ p.leetcode_rating }}</p>
+        <a href="{% url 'user_detail' p.user.id %}">Подробнее</a>
+    </div>
+{% endfor %}

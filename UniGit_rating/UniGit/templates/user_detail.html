@@ -1,0 +1,36 @@
+<h1>Профиль: {{ profile.github_username|default:"Нет ника" }}</h1>
+<p>Задач решено: {{ profile.problems_solved|default:"0" }}</p>
+
+<!-- Секция ссылок -->
+<div class="profile-links">
+    {% if github_url %}
+        <p>GitHub: <a href="{{ github_url }}" target="_blank" style="color: #00E676;">Перейти в профиль</a></p>
+    {% else %}
+        <p>GitHub не привязан</p>
+    {% endif %}
+
+    {% if profile.leetcode_username %}
+        <p>LeetCode:
+            <a href="https://leetcode.com/u/{{ profile.leetcode_username }}/" target="_blank" style="color: #FFA000;">
+                Перейти в профиль ({{ profile.leetcode_username }})
+            </a>
+        </p>
+    {% else %}
+        <p>LeetCode не привязан</p>
+    {% endif %}
+</div>
+
+<h3>Мои репозитории:</h3>
+<ul>
+    {% for repo in profile.user.repositories.all %}
+        <li>
+            <strong>{{ repo.name }}</strong>
+            (Коммитов: {{ repo.commits.count }})
+            — Владелец: {{ repo.owner.profile.github_username|default:"Нет ника" }}
+        </li>
+    {% empty %}
+        <li>Нет репозиториев</li>
+    {% endfor %}
+</ul>
+
+<a href="{% url 'home' %}">Назад на главную</a>

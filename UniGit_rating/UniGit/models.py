@@ -17,3 +17,14 @@ class Commit(models.Model):
 
     def __str__(self):
         return self.message[:50]
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    leetcode_username = models.CharField(max_length=50, blank=True, null=True)
+    leetcode_rating = models.IntegerField(default=0)
+    unigit_rating = models.IntegerField(default=0)
+    github_username = models.CharField(max_length=50, blank=True, null=True)
+    problems_solved = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.user.username

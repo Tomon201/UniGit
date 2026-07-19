@@ -1,7 +1,13 @@
-# created by virtualenv automatically
+# Игнорируем базу данных везде
+**/db.sqlite3
+**/db.sqlite3-journal
+
+# Среды и IDE
+.venv/
+venv/
+.idea/
+.vscode/
 .env
 *.pem
 keys/
-db.sqlite3
-.idea/
-.venv/
+__pycache__/
