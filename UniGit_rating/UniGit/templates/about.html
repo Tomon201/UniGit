@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>О проекте - UniGit</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #000000;
+            --accent: #ffffff;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container { max-width: 800px; margin: 0 auto; }
+
+        .back-link { color: var(--text-muted); text-decoration: none; display: flex; align-items: center; gap: 8px; margin-bottom: 40px;}
+        .back-link:hover { color: var(--text-main); }
+
+        h1 { font-size: 48px; margin: 0 0 20px 0; }
+        h1 span { color: var(--accent); }
+        h2 { color: var(--accent); margin-top: 40px; }
+
+        p { color: var(--text-muted); font-size: 18px; line-height: 1.6; margin-bottom: 20px; }
+
+        .card { 
+            background: rgba(26, 26, 31, 0.8); 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            border-radius: 20px; 
+            padding: 40px; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{% url 'home' %}" class="back-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+            На главную
+        </a>
+
+        <div class="card">
+            <h1>О проекте <span>UniGit</span></h1>
+            <p>UniGit — это платформа, созданная для того, чтобы помочь IT-студентам Казахстана продемонстрировать свои реальные навыки написания кода и решения алгоритмических задач.</p>
+            
+            <h2>Зачем это нужно?</h2>
+            <p>Часто оценки в университете не отражают реальный уровень программиста. Работодателям (HR) нужны не дипломы, а реальные пет-проекты, коммиты и умение решать задачи. UniGit собирает данные из GitHub и LeetCode, анализирует их и строит прозрачный рейтинг студентов.</p>
+
+            <h2>Как это работает?</h2>
+            <p>Вы привязываете свой GitHub и LeetCode, а наши алгоритмы автоматически отслеживают вашу активность: количество репозиториев, коммиты, сложность решенных задач. Все это формирует ваш уникальный UniGit Рейтинг.</p>
+        </div>
+    </div>
+</body>
+</html>

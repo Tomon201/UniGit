@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Выход - UniGit</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #050505;
+            --accent: #2ab696;
+            --text-main: #ffffff;
+            --text-muted: #a1a1aa;
+            --danger: #ef4444;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .decor-circle {
+            position: fixed;
+            background: var(--accent);
+            border-radius: 50%;
+            z-index: -1;
+            opacity: 0.8;
+            filter: blur(100px);
+        }
+        
+        .decor-top { top: -100px; right: -100px; width: 300px; height: 300px; }
+        .decor-bottom { bottom: -100px; left: -100px; width: 300px; height: 300px; background: var(--danger); opacity: 0.5; }
+
+        .card {
+            background: rgba(26, 26, 31, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0, 0.5);
+        }
+
+        h1 { margin: 0 0 16px 0; font-size: 28px; }
+        p { color: var(--text-muted); margin: 0 0 30px 0; line-height: 1.5; }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            transition: 0.2s;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid var(--danger); margin-bottom: 12px; }
+        .btn-danger:hover { background: var(--danger); color: #fff; }
+
+        .btn-outline { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--text-main); }
+        .btn-outline:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.2); }
+    </style>
+</head>
+<body>
+    <div class="decor-circle decor-top"></div>
+    <div class="decor-circle decor-bottom"></div>
+
+    <div class="card">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2" style="margin-bottom: 20px;">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+        
+        <h1>Выход</h1>
+        <p>Вы уверены, что хотите выйти из аккаунта?</p>
+
+        <form method="post" action="{% url 'account_logout' %}">
+            {% csrf_token %}
+            {% if redirect_field_value %}
+            <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+            {% endif %}
+            <button type="submit" class="btn btn-danger">Да, выйти</button>
+        </form>
+        <a href="javascript:history.back()" class="btn btn-outline">Отмена</a>
+    </div>
+</body>
+</html>

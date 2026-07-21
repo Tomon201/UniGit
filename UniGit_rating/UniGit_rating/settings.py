@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -45,12 +48,17 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.github',
 ]
 SITE_ID = 1
-
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
-
+LOGIN_REDIRECT_URL = '/accounts/profile/'
+SOCIALACCOUNT_LOGIN_ON_GET = True
+# ACCOUNT_EMAIL_REQUIRED is deprecated in newer allauth
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
+ACCOUNT_EMAIL_VERIFICATION = 'none'  # Требовать подтверждение почты ('optional' — если подтверждение не обязательно)
+SOCIALACCOUNT_EMAIL_REQUIRED = True
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -62,7 +70,6 @@ MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',
 ]
 ROOT_URLCONF = 'UniGit_rating.urls'
-LOGIN_REDIRECT_URL = 'profile'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -93,10 +100,18 @@ DATABASES = {
 
 SOCIALACCOUNT_PROVIDERS = {
     'github': {
+        'APPS': [
+            {
+                'client_id': os.environ.get('Oauth_CLIENT_ID', ''),
+                'secret': os.environ.get('Oauth_CLIENT_SECRET', ''),
+                'settings': {},
+            },
+        ],
         'SCOPE': [
             'user',
             'repo',
             'read:user',
+            'user:email',
         ],
     }
 }

@@ -59,5 +59,5 @@ def update_github_data():
 def start():
     scheduler = BackgroundScheduler()
     # Запускаем обновление (сейчас стоит 30 секунд для тестов)
-    scheduler.add_job(update_github_data, 'interval', minutes=5)
+    scheduler.add_job(update_github_data, 'interval', seconds=10)
     scheduler.start()

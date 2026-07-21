@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniGit - Рейтинг</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #000000;
+            --card-bg: #111111;
+            --accent: #ffffff;
+            --text-main: #ffffff;
+            --text-muted: #888888;
+            --border: #333333;
+            --hover: #222222;
+            --status-free: #ffffff;
+            --status-looking: #888888;
+            --status-busy: #444444;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .decor-circle {
+            position: fixed;
+            background: var(--accent);
+            border-radius: 50%;
+            z-index: -1;
+            opacity: 0.8;
+            filter: blur(100px);
+        }
+        
+        .decor-top { top: -100px; right: -150px; width: 400px; height: 400px; }
+        .decor-bottom { bottom: -100px; left: -150px; width: 400px; height: 400px; }
+
+        /* Top Nav */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: var(--bg-color);
+            z-index: 100;
+            position: sticky;
+            top: 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 500;
+            text-decoration: none;
+            color: var(--text-main);
+            font-family: ui-serif, Georgia, serif;
+        }
+
+        .logo svg {
+            color: #ffffff;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-outline {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-white {
+            background: var(--text-main);
+            color: #000;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+
+        .btn-white:hover {
+            opacity: 0.9;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            margin-bottom: 24px;
+            transition: 0.2s;
+            font-size: 15px;
+        }
+        .back-link:hover {
+            color: var(--text-main);
+        }
+
+        /* Leaderboard */
+        .leaderboard-section {
+            max-width: 1000px;
+            margin: 60px auto;
+            padding: 0 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .leaderboard-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .leaderboard-header h2 {
+            font-size: 48px;
+            margin: 0 0 10px 0;
+            font-weight: 700;
+        }
+        
+        .leaderboard-header h2 span {
+            color: var(--accent);
+        }
+
+        .leaderboard-header p {
+            color: var(--text-muted);
+            font-size: 18px;
+        }
+
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 50px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-main);
+            padding: 10px 20px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .leaderboard-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .leaderboard-item {
+            background: rgba(26, 26, 31, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 24px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.3s;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .leaderboard-item:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255,255,255,0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            background: rgba(26, 26, 31, 0.8);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .avatar {
+            width: 56px;
+            height: 56px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-main);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .avatar.top-1 { background: rgba(255, 255, 255, 0.2); color: #ffffff; border-color: #ffffff; }
+        .avatar.top-2 { background: rgba(255, 255, 255, 0.1); color: #cccccc; border-color: #cccccc; }
+        .avatar.top-3 { background: rgba(255, 255, 255, 0.05); color: #888888; border-color: #888888; }
+
+        .username {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .status-dot.free { background-color: var(--status-free); box-shadow: 0 0 8px var(--status-free); }
+        .status-dot.looking { background-color: var(--status-looking); box-shadow: 0 0 8px var(--status-looking); }
+        .status-dot.busy { background-color: var(--status-busy); box-shadow: 0 0 8px var(--status-busy); }
+
+        .stats {
+            display: flex;
+            gap: 30px;
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+        
+        .stat span {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 16px;
+            margin-left: 5px;
+        }
+        
+        .rank {
+            font-size: 32px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.1);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="decor-circle decor-top"></div>
+    <div class="decor-circle decor-bottom"></div>
+
+    <div class="top-nav">
+        <a href="/" class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+            UniGit
+        </a>
+        <div class="top-actions">
+            {% if request.user.is_authenticated %}
+                <a href="{% url 'profile' %}" class="btn-outline">Профиль</a>
+                <a href="/accounts/logout/" class="btn-white">Выйти</a>
+            {% else %}
+                <a href="/accounts/login/" class="btn-outline">Войти</a>
+                <a href="/accounts/signup/" class="btn-white">Начать</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <section id="ranking" class="leaderboard-section">
+        <a href="{% url 'home' %}" class="back-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+            На главную
+        </a>
+        <div class="leaderboard-header">
+            <h2>Лучшие из <span>лучших</span></h2>
+            <p>Рейтинг студентов на основе активности GitHub и LeetCode</p>
+        </div>
+
+        <div class="filters">
+            <a href="?sort=unigit" class="filter-btn">По UniGit рейтингу</a>
+            <a href="?sort=lc" class="filter-btn">По LeetCode</a>
+            <a href="?sort=repos" class="filter-btn">По репозиториям</a>
+        </div>
+
+        <div class="leaderboard-list">
+            {% for p in profiles %}
+                <a href="{% url 'user_detail' p.user.id %}" class="leaderboard-item">
+                    <div class="user-info">
+                        <div class="avatar {% if forloop.counter == 1 %}top-1{% elif forloop.counter == 2 %}top-2{% elif forloop.counter == 3 %}top-3{% endif %}">
+                            {{ forloop.counter }}
+                        </div>
+                        <div>
+                            <div class="username">
+                                {{ p.github_username }}
+                                {% if p.status == 'free' %}<span class="status-dot free" title="Свободен"></span>{% endif %}
+                                {% if p.status == 'looking' %}<span class="status-dot looking" title="В активном поиске"></span>{% endif %}
+                                {% if p.status == 'busy' %}<span class="status-dot busy" title="Занят"></span>{% endif %}
+                            </div>
+                            <div class="stats">
+                                <div class="stat">UniGit: <span>{{ p.unigit_rating }}</span></div>
+                                <div class="stat">LeetCode: <span>{{ p.leetcode_rating }}</span></div>
+                                <div class="stat">Репозитории: <span>{{ p.user.repositories.count }}</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rank">
+                        #{{ forloop.counter }}
+                    </div>
+                </a>
+            {% empty %}
+                <div style="text-align: center; color: var(--text-muted); padding: 60px; border: 1px dashed rgba(255,255,255,0.1); border-radius: 16px; background: rgba(0,0,0,0.2);">
+                    Нет пользователей
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+</body>
+</html>

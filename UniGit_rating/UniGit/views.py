@@ -43,6 +43,34 @@ def get_leetcode_stats(username):
             return None
     return None
 
+def verify_leetcode_account(username, token):
+    url = "https://leetcode.com/graphql/"
+    query = '''
+    query getUserProfile($username: String!) {
+        matchedUser(username: $username) {
+            profile {
+                aboutMe
+                realName
+                websites
+                company
+            }
+        }
+    }
+    '''
+    variables = {"username": username}
+    response = requests.post(url, json={'query': query, 'variables': variables})
+
+    if response.status_code == 200:
+        data = response.json()
+        try:
+            profile_data = data.get('data', {}).get('matchedUser', {}).get('profile', {})
+            profile_str = str(profile_data)
+            if token in profile_str:
+                return True
+        except:
+            pass
+    return False
+
 def github_login(request):
     url = f"https://github.com/login/oauth/authorize?client_id={CLIENT_ID}&scope=repo"
     return redirect(url)
@@ -62,8 +90,18 @@ def github_callback(request):
     return HttpResponse(f"Успех! Твой токен: {token}")
 
 
-def show_rating(request):
-    profiles = Profile.objects.all()
+def home_view(request):
+    return render(request, 'index.html')
+
+def about_view(request):
+    return render(request, 'about.html')
+
+def for_companies_view(request):
+    return render(request, 'for_companies.html')
+
+def ranking_view(request):
+    # Не показываем аккаунты без github
+    profiles = Profile.objects.exclude(github_username__isnull=True).exclude(github_username='')
     sort_by = request.GET.get('sort', 'unigit') # Дефолтная сортировка
 
     if sort_by == 'repos':
@@ -73,7 +111,7 @@ def show_rating(request):
     else: # unigit
         profiles = profiles.order_by('-unigit_rating')
 
-    return render(request, 'index.html', {'profiles': profiles})
+    return render(request, 'ranking.html', {'profiles': profiles})
 
 
 # Новая функция для детальной страницы
@@ -129,6 +167,7 @@ def github_webhook(request):
                 sha=sha,
                 defaults={'message': message}
             )
+            print("работает")
 
     return HttpResponse("Data saved!", status=200)
 
@@ -137,26 +176,69 @@ def github_webhook(request):
 def profile_view(request):
     profile, created = Profile.objects.get_or_create(user=request.user)
 
-    # 1. Обработка смены ника LeetCode
+    # 1. Обработка POST запросов
     if request.method == 'POST':
-        username = request.POST.get('leetcode_username', '').strip()
-        profile.leetcode_username = username if username else None
-        profile.save()
-        messages.success(request, "Данные обновлены!")
-        return redirect('profile')
+        action = request.POST.get('action')
+        
+        if action == 'unlink_github':
+            SocialAccount.objects.filter(user=request.user, provider='github').delete()
+            profile.github_username = None
+            profile.save()
+            messages.success(request, "GitHub аккаунт отвязан!")
+            return redirect('profile')
+            
+        elif action == 'update_profile':
+            new_lc_username = request.POST.get('leetcode_username', '').strip()
+            
+            # Если юзернейм поменялся, сбрасываем верификацию и генерим новый токен
+            if new_lc_username != profile.leetcode_username:
+                profile.leetcode_username = new_lc_username if new_lc_username else None
+                profile.is_leetcode_verified = False
+                if profile.leetcode_username:
+                    import uuid
+                    profile.leetcode_verify_token = f"unigit-{uuid.uuid4().hex[:8]}"
+                else:
+                    profile.leetcode_verify_token = None
+
+            profile.description = request.POST.get('description', '').strip()
+            profile.contacts = request.POST.get('contacts', '').strip()
+            profile.status = request.POST.get('status', 'free')
+            profile.save()
+            messages.success(request, "Данные обновлены!")
+            return redirect('profile')
+            
+        elif action == 'verify_leetcode':
+            if profile.leetcode_username and profile.leetcode_verify_token:
+                is_verified = verify_leetcode_account(profile.leetcode_username, profile.leetcode_verify_token)
+                if is_verified:
+                    profile.is_leetcode_verified = True
+                    profile.save()
+                    messages.success(request, "LeetCode аккаунт успешно подтвержден!")
+                else:
+                    messages.error(request, "Секретный код не найден в профиле LeetCode. Убедитесь, что вы сохранили изменения на платформе LeetCode.")
+            return redirect('profile')
+        
+        else: # Для обратной совместимости, если кто-то отправит старую форму
+            username = request.POST.get('leetcode_username', '').strip()
+            profile.leetcode_username = username if username else None
+            profile.save()
+            messages.success(request, "Данные обновлены!")
+            return redirect('profile')
 
     # 2. Сбор статистики
     repo_count = Repository.objects.filter(owner=request.user).count()
     commit_count = Commit.objects.filter(repository__owner=request.user).count()
 
     lc_solved = 0
-    if profile.leetcode_username:
+    if profile.leetcode_username and profile.is_leetcode_verified:
         lc_solved = get_leetcode_stats(profile.leetcode_username) or 0
         profile.problems_solved = lc_solved
+    elif not profile.is_leetcode_verified:
+        profile.problems_solved = 0
 
     # 3. Расчет и сохранение рейтингов
     profile.unigit_rating = int((repo_count * 5) + (commit_count * 0.5))
-    profile.leetcode_rating = int(lc_solved * 3)
+    profile.leetcode_rating = int(lc_solved * 3) if profile.is_leetcode_verified else 0
     profile.save()
 
     return render(request, 'profile.html', {
