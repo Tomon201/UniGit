@@ -70,6 +70,8 @@ SECRET_KEY=your-django-insecure-secret-key
 DEBUG=True
 GITHUB_CLIENT_ID=your_github_client_id
 GITHUB_CLIENT_SECRET=your_github_client_secret
+Oauth_CLIENT_ID=your_oauth_client_id
+Oauth_CLIENT_SECRET=youroauth_client_secret
 ```
 
 ### 6. Миграции базы данных
